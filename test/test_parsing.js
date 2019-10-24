@@ -7,18 +7,17 @@ let assert = require("assert");
 
 let fixturesDir = path.resolve(__dirname, "fixtures");
 
-let assertSame = assert.strictEqual;
+let { strictEqual: assertSame, deepStrictEqual: assertDeep } = assert;
 
 describe("parsing", _ => {
 	it("should separate headers from body", () => {
 		let filepath = fixture("sample.tid");
 		return colonParse(filepath).
 			then(({ headers, body }) => {
-				let sep = token();
-				assertSame(Object.keys(headers).join(sep),
-						["title", "format"].join(sep));
-				assertSame(headers.title, "Hello World");
-				assertSame(headers.format, "txt");
+				assertDeep(headers, {
+					title: "Hello World",
+					format: "txt"
+				});
 				assertSame(body, `
 lorem ipsum
 dolor sit amet
@@ -39,11 +38,10 @@ ut enim ad minim veniam, quis nostrud exercitation ullamco laboris
 		let filepath = fixture("front_matter.tid");
 		return colonParse(filepath).
 			then(({ headers, body }) => {
-				let sep = token();
-				assertSame(Object.keys(headers).join(sep),
-						["hello", "bar"].join(sep));
-				assertSame(headers.hello, "foo");
-				assertSame(headers.bar, "world");
+				assertDeep(headers, {
+					hello: "foo",
+					bar: "world"
+				});
 				assertSame(body, "lorem\n  ipsum");
 			});
 	});
@@ -52,11 +50,10 @@ ut enim ad minim veniam, quis nostrud exercitation ullamco laboris
 		let filepath = fixture("front_matter.tid");
 		return colonParse(filepath, { trim: false }).
 			then(({ headers, body }) => {
-				let sep = token();
-				assertSame(Object.keys(headers).join(sep),
-						["hello ", "bar   "].join(sep));
-				assertSame(headers["hello "], " foo    ");
-				assertSame(headers["bar   "], " world  ");
+				assertDeep(headers, {
+					"hello ": " foo    ",
+					"bar   ": " world  "
+				});
 				assertSame(body, "  lorem\n  ipsum  ");
 			});
 	});
@@ -86,10 +83,4 @@ ut enim ad minim veniam, quis nostrud exercitation ullamco laboris
 
 function fixture(filepath) {
 	return path.resolve(fixturesDir, filepath);
-}
-
-// adapted from https://stackoverflow.com/a/105074
-function token() {
-	let id = Math.floor((1 + Math.random()) * 65536).toString(16).substring(1);
-	return `<${id}>`;
 }

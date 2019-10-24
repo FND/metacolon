@@ -5,7 +5,8 @@ let readline = require("readline");
 
 // parses RFC 822-style text file with headers and body
 // returns a promise of `{ headers, body }`
-module.exports = function colonParse(filepath, { trim = true } = {}) {
+module.exports = function colonParse(filepath,
+		{ trim = true, header } = {}) {
 	let rl = readline.createInterface({
 		input: fs.createReadStream(filepath),
 		crlfDelay: Infinity
@@ -41,7 +42,12 @@ module.exports = function colonParse(filepath, { trim = true } = {}) {
 				key = key.trim();
 				value = value.trim();
 			}
-			headers[key] = value;
+			if(header) {
+				[key, value] = header(key, value);
+			}
+			if(key !== null) {
+				headers[key] = value;
+			}
 		});
 
 		rl.on("close", _ => {

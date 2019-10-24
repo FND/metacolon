@@ -34,6 +34,23 @@ ut enim ad minim veniam, quis nostrud exercitation ullamco laboris
 			});
 	});
 
+	it("should optionally convert or omit headers", () => {
+		let filepath = fixture("front_matter_alt.tid");
+		return colonParse(filepath, {
+			header: (key, value) => [
+				key === "foo" ? null : `~${key}~`,
+				value === "True" ? true :
+					(isNaN(value) ? value : parseFloat(value))
+			]
+		}).
+			then(({ headers, body }) => {
+				assertDeep(headers, {
+					"~count~": 123,
+					"~safe~": true
+				});
+			});
+	});
+
 	it("should trim leading and trailing whitespace", () => {
 		let filepath = fixture("front_matter.tid");
 		return colonParse(filepath).

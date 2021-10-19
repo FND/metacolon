@@ -21,7 +21,7 @@ $ npm install metacolon
 ```javascript
 let colonParse = require("metacolon");
 
-colonParse("sample.md").then({ headers, body }) => {
+colonParse("sample.md").then(({ headers, body }) => {
     // …
 });
 ```

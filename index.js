@@ -61,5 +61,9 @@ module.exports = function colonParse(filepath,
 			}
 			resolve({ headers, body });
 		});
+
+		rl.on("error", err => {
+			reject(err);
+		});
 	});
 };

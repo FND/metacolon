@@ -1,0 +1,22 @@
+{
+	"tasks": {
+		"vet": "deno lint && deno fmt --check"
+	},
+	"fmt": {
+		"include": ["./src", "./test"],
+		"exclude": ["./test/*.md"],
+		"lineWidth": 90,
+		"useTabs": true,
+		"indentWidth": 4
+	},
+	"lint": {
+		"include": ["./src", "./test"],
+		"rules": {
+			"include": ["eqeqeq"],
+			"exclude": ["prefer-const"]
+		}
+	},
+	"test": {
+		"include": ["./test/test_*.js"]
+	}
+}

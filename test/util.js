@@ -2,5 +2,9 @@ export let ENCODER = new TextEncoder();
 export let DECODER = new TextDecoder();
 
 export function bytes2strings(items) {
-	return [...items.map((item) => DECODER.decode(item))];
+	let res = [];
+	for (let item of items) {
+		res.push(DECODER.decode(item));
+	}
+	return res;
 }

@@ -1,9 +1,11 @@
 import { parseHeaders } from "./core.js";
 import { createReadStream } from "node:fs";
 
+let PROMISE = Promise.withResolvers ? Promise : { withResolvers };
+
 export function colonParse(filepath, options) {
 	let stream = createReadStream(filepath);
-	let { promise, resolve, reject } = Promise.withResolvers();
+	let { promise, resolve, reject } = PROMISE.withResolvers();
 	let data;
 	stream.on("data", (chunk) => {
 		if (data === undefined) {
@@ -37,4 +39,13 @@ export function colonParse(filepath, options) {
 		resolve({ headers, body });
 	});
 	return promise;
+}
+
+function withResolvers() {
+	let res = {};
+	res.promise = new Promise((resolve, reject) => {
+		res.resolve = resolve;
+		res.reject = reject;
+	});
+	return res;
 }

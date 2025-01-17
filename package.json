@@ -1,6 +1,6 @@
 {
 	"name": "metacolon",
-	"version": "2.0.0",
+	"version": "2.0.1",
 	"description": "parses RFC 822-style text files with headers and body",
 	"author": "FND",
 	"license": "Apache-2.0",
@@ -18,7 +18,7 @@
 		"test": "node --test test/test_*.js"
 	},
 	"engines": {
-		"node": ">=22"
+		"node": ">=20"
 	},
 	"dependencies": {},
 	"devDependencies": {

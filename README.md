@@ -2,6 +2,8 @@
 
 parses RFC 822-style text files with headers and body
 
+NB: expects UTF-8 encoding
+
 ```
 title: Hello World
 format: markdown

@@ -5,8 +5,9 @@ import assert, {
 	strictEqual as assertSame,
 } from "node:assert";
 
-let FILEPATH = import.meta.resolve("./sample.md").replace("file://", "");
-let EXPECTED_BODY_START = `
+let FILES = ["./sample_lf.md", "./sample_crlf.md"]
+	.map((filepath) => import.meta.resolve(filepath).replace("file://", ""));
+let EXPECTED_START = `
 lorem ipsum
 dolor sit amet
 
@@ -24,38 +25,48 @@ ut enim ad minim veniam, quis nostrud exercitation ullamco laboris
 The following text was chosen to trigger multi-chunk file streaming; boundaries
 were determined empirically and might be subject to change.
 `.trim() + "\n";
-let EXPECTED_BODY_END = `
+let EXPECTED_START_CRLF = EXPECTED_START.replaceAll("\n", "\r\n");
+let EXPECTED_END = `
 culpa qui officia deserunt mollit anim id est laborum.
 
 EOF
 `.trim() + "\n";
+let EXPECTED_END_CRLF = EXPECTED_END.replaceAll("\n", "\r\n");
 
 test("typical sample", async () => {
-	let res = colonParse(FILEPATH);
-	assertSame(typeof res.then, "function");
+	for (let filepath of FILES) {
+		let res = colonParse(filepath);
+		assertSame(typeof res.then, "function", filepath);
 
-	let { headers, body } = await res;
-	// deno-fmt-ignore
-	assertDeep(headers, new Map([
-		["title", " Hello World"],
-		["format", " txt"],
-	]));
-	assert(body.startsWith(EXPECTED_BODY_START));
-	assert(body.endsWith(EXPECTED_BODY_END));
+		let { headers, body } = await res;
+		// deno-fmt-ignore
+		assertDeep(headers, new Map([
+			["title", " Hello World"],
+			["format", " txt"],
+		]), filepath);
+		assertContent(body, filepath);
+	}
 });
 
 test("whitespace trimming", async () => {
-	let { headers, body } = await colonParse(FILEPATH, { trim: true });
-	// deno-fmt-ignore
-	assertDeep(headers, new Map([
-		["title", "Hello World"],
-		["format", "txt"],
-	]));
-	assert(body.startsWith(EXPECTED_BODY_START));
-	assert(body.endsWith(EXPECTED_BODY_END));
+	for (let filepath of FILES) {
+		let { headers, body } = await colonParse(filepath, { trim: true });
+		// deno-fmt-ignore
+		assertDeep(headers, new Map([
+			["title", "Hello World"],
+			["format", "txt"],
+		]), filepath);
+		assertContent(body, filepath);
+	}
 });
 
 test("balks at invalid file paths", async () => {
 	let res = colonParse("./dummy.md");
 	await assert.rejects(res, /ENOENT: .*dummy.md/);
 });
+
+function assertContent(body, filepath) {
+	let crlf = filepath.endsWith("_crlf.md");
+	assert(body.startsWith(crlf ? EXPECTED_START_CRLF : EXPECTED_START), filepath);
+	assert(body.endsWith(crlf ? EXPECTED_END_CRLF : EXPECTED_END), filepath);
+}

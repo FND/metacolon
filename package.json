@@ -1,6 +1,6 @@
 {
 	"name": "metacolon",
-	"version": "2.0.2",
+	"version": "2.0.3",
 	"description": "parses RFC 822-style text files with headers and body",
 	"author": "FND",
 	"license": "Apache-2.0",
